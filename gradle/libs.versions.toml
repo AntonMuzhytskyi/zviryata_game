@@ -1,6 +1,5 @@
 [versions]
 agp = "8.9.1"
-hiltAndroid = "2.48"
 hiltNavigationCompose = "1.2.0"
 imageLoader = "1.6.1"
 kotlin = "2.0.21"
@@ -13,18 +12,14 @@ activityCompose = "1.8.0"
 composeBom = "2024.09.00"
 kotlinStdlib = "2.0.21"
 kotlinTest = "2.0.21"
-playServicesAds = "24.1.0"
-resources = "1.5.0"
+lottieCompose = "6.1.0"
+playServicesAds = "24.0.0"
 runner = "1.5.2"
 core = "1.5.0"
-uiAndroid = "1.7.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" } # Добавьте эту строку
-
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -43,9 +38,8 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", versio
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlinTest" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
-resources = { module = "org.jetbrains.compose.resources:resources", version.ref = "resources" }
-androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

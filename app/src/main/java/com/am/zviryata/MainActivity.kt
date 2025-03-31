@@ -1,162 +1,136 @@
 package com.am.zviryata
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-
-import androidx.compose.ui.tooling.preview.Preview
-import com.am.zviryata.ui.theme.ZviryataTheme
-
-import android.content.res.Configuration
-import androidx.compose.ui.graphics.asImageBitmap
-
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.am.zviryata.repository.GameRepository
+import com.am.zviryata.services.AdManager
+import com.am.zviryata.ui.theme.LevelScreen
+import com.am.zviryata.ui.theme.MenuScreen
+import com.am.zviryata.ui.theme.ZviryataTheme
+import com.am.zviryata.viewmodel.GameViewModel
+import com.am.zviryata.viewmodel.GameViewModelFactory
 import com.google.android.gms.ads.MobileAds
 
-
-
+/**
+ * Main entry point of the application.
+ * Initializes ads and sets up the Compose UI.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
+        MobileAds.initialize(this) {} // Initialize Google Mobile Ads
 
-        MobileAds.initialize(this) {}
-
-        setContent {
-            MainMenuScreen()
-        }
-    }
-}
-
-@Composable
-fun MainMenuScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Cyan),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Звірята",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        LevelGrid()
-        Spacer(modifier = Modifier.weight(1f))
-        //AdMobBanner()
-    }
-}
-@Composable
-fun LevelGrid() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(modifier = Modifier.padding(8.dp)) {
-            LevelButton("Уровень 1", R.drawable.level_room)
-            LevelButton("Уровень 2", R.drawable.level_room)
-            LevelButton("Уровень 3", R.drawable.level_room)
-        }
-        Row(modifier = Modifier.padding(8.dp)) {
-            LevelButton("Уровень 4", R.drawable.level_room)
-            LevelButton("Уровень 5", R.drawable.level_room)
-        }
-    }
-}
-
-@Composable
-fun LevelButton(levelName: String, imageRes: Int) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(8.dp)
-            .clickable { /* TODO: Запуск уровня*/  }
-    ) {
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = levelName,
-            modifier = Modifier.size(100.dp),
-            contentScale = ContentScale.Crop
-        )
-        Text(text = levelName, fontSize = 18.sp)
-    }
-}
-
-
-
-
-@Composable
-fun AdMobBanner() {
-    AndroidView(
-        factory = { context ->
-            AdView(context).apply {
-                setAdSize(AdSize.BANNER)
-                adUnitId = "ca-app-pub-3940256099942544/9214589741" // ca-app-pub-4687771932576156/6389942662    acc ca-app-pub-4687771932576156~3385371346
-                loadAd(AdRequest.Builder().build())
-            }
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-
-
-/*
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             ZviryataTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavigation()
                 }
             }
         }
     }
 }
 
+/**
+ * Sets up navigation for the app using Jetpack Compose Navigation.
+ */
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
+fun AppNavigation() {
+    val navController = rememberNavController()
+    val context = LocalContext.current
+    val gameViewModel: GameViewModel = viewModel(
+        factory = GameViewModelFactory(GameRepository(LocalContext.current), AdManager(context))
     )
+
+    NavHost(navController, startDestination = "menu") {
+        composable("menu") {
+            MenuScreen(navController, gameViewModel)
+        }
+        composable("level/{levelId}") { backStackEntry ->
+            val levelId = backStackEntry.arguments?.getString("levelId")?.toIntOrNull() ?: 1
+            LevelScreen(
+                viewModel = gameViewModel,
+                levelId = levelId,
+                onBack = { navController.popBackStack() },
+                onNext = { nextLevelId ->
+                    if (nextLevelId == 0) { // Game completed
+                        navController.navigate("menu") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate("level/$nextLevelId") {
+                            popUpTo("menu") { inclusive = false }
+                        }
+                    }
+                }
+            )
+        }
+    }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ZviryataTheme {
-        Greeting("Android")
+
+//1000
+/*
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        MobileAds.initialize(this) {}
+
+        setContent {
+            ZviryataTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavigation() }
+            }
+        }
     }
-}*/
+}
+
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+    val gameViewModel: GameViewModel = viewModel(factory = GameViewModelFactory(GameRepository(LocalContext.current)))
+
+    NavHost(navController, startDestination = "menu") {
+        composable("menu") {
+            MenuScreen(navController, gameViewModel)
+        }
+        composable("level/{levelId}") { backStackEntry ->
+            val levelId = backStackEntry.arguments?.getString("levelId")?.toIntOrNull()
+                ?: 1
+            LevelScreen(
+                viewModel = gameViewModel,
+                levelId = levelId,
+                onBack = { navController.popBackStack() },
+                onNext = { nextLevelId ->
+                    if (gameViewModel.gameRepository.getLevel(nextLevelId) != null) {
+                        navController.navigate("level/$nextLevelId") {
+                            popUpTo("menu") { inclusive = false }
+                        }
+                    } else {
+                        navController.navigate("menu") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
+*/

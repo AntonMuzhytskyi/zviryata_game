@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">Zviryata</string>
+    <string name="app_name">Звірята</string>
+    <string name="ferma">Ферма</string>
+    <string name="forest">Ліс</string>
+    <string name="appartament">Кімната</string>
+    <string name="jungle">Джунглі</string>
+    <string name="sands">Пустеля</string>
+    <string name="ants">Комахи</string>
 </resources>
