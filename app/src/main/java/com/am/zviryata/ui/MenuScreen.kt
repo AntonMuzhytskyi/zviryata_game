@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import com.am.zviryata.R
 import com.am.zviryata.model.LevelData
 import com.am.zviryata.services.AdManager
 import com.am.zviryata.viewmodel.GameViewModel
+import com.google.android.gms.ads.AdRequest
 
 /*
  * Copyright (c) 2025-Present, Anton Muzhytskyi
@@ -56,7 +58,8 @@ fun MenuScreen(
     gameViewModel: GameViewModel
 ) {
     val context = LocalContext.current
-    val adManager = remember { AdManager(context) }
+    //val adManager = remember { AdManager(context) }
+    val adView = remember { AdManager(context).createBannerAdView() }
 
     // Background music management
     val mediaPlayer = remember {
@@ -64,6 +67,10 @@ fun MenuScreen(
             isLooping = true
             setVolume(0.5f, 0.5f)
         }
+    }
+
+    LaunchedEffect(Unit) {
+        adView.loadAd(AdRequest.Builder().build())
     }
 
     // Lifecycle for sound
@@ -100,7 +107,7 @@ fun MenuScreen(
         Image(
             painter = painterResource(id = R.drawable.background_main),
             contentDescription = "Menu Background",
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize()
         )
 
@@ -187,9 +194,9 @@ fun MenuScreen(
                 contentAlignment = Alignment.Center
             ) {
                 AndroidView(
-                    factory = { adManager.createBannerAdView() },
+                    factory = { adView },
                     modifier = Modifier
-                        .width(320.dp)
+                        .fillMaxWidth()
                         .height(50.dp)
                 )
             }

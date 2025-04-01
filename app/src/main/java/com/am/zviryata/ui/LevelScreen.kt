@@ -51,6 +51,7 @@ import com.am.zviryata.R
 import com.am.zviryata.viewmodel.GameViewModel
 import com.am.zviryata.services.AdManager
 import com.am.zviryata.viewmodel.LevelState
+import com.google.android.gms.ads.AdRequest
 import kotlinx.coroutines.delay
 
 /*
@@ -77,16 +78,21 @@ fun LevelScreen(
     onBack: () -> Unit,
     onNext: (Int) -> Unit
 ) {
+
     val context = LocalContext.current
     val levelState by viewModel.levelState.collectAsState()
     val currentLevel by viewModel.currentLevel.collectAsState()
     val clickedAnimals by viewModel.animalsClicked.collectAsState()
     val levelData = viewModel.gameRepository.getLevel(currentLevel)
-    val adManager = remember { AdManager(context) }
+    val adView = remember { AdManager(context).createBannerAdView() }
     var localLevelState by remember { mutableStateOf<LevelState>(LevelState.Initial) }
     var showCelebration by remember { mutableStateOf(false) }
     var levelCompleted by remember { mutableStateOf(false) }
     val mediaPlayer = remember { mutableStateOf<MediaPlayer?>(null) }
+
+    LaunchedEffect(Unit) {
+        adView.loadAd(AdRequest.Builder().build())
+    }
 
     LaunchedEffect(clickedAnimals.size) {
         if (clickedAnimals.size == (levelData?.animals?.size ?: 0) && !showCelebration) {
@@ -116,7 +122,7 @@ fun LevelScreen(
             painter = levelData?.backgroundRes?.let { painterResource(id = it) }
                 ?: painterResource(id = R.drawable.background_main),
             contentDescription = "Level Background",
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize()
         )
 
@@ -219,7 +225,7 @@ fun LevelScreen(
             contentAlignment = Alignment.Center
         ) {
             AndroidView(
-                factory = { adManager.createBannerAdView() },
+                factory = { adView },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
