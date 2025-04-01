@@ -11,6 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+/*
+ * Copyright (c) 2025-Present, Anton Muzhytskyi
+ * All rights reserved.
+ *
+ * This code is developed and owned by Anton Muzhytskyi.
+ * Unauthorized copying of this file, via any medium, is strictly prohibited.
+ */
+
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,

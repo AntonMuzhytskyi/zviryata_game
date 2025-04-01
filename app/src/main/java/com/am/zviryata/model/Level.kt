@@ -1,5 +1,13 @@
 package com.am.zviryata.model
 
+/*
+ * Copyright (c) 2025-Present, Anton Muzhytskyi
+ * All rights reserved.
+ *
+ * This code is developed and owned by Anton Muzhytskyi.
+ * Unauthorized copying of this file, via any medium, is strictly prohibited.
+ */
+
 /**
  * Data class representing a game level.
  *

@@ -8,10 +8,16 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-
 import kotlinx.coroutines.delay
-
 import kotlinx.coroutines.flow.asStateFlow
+
+/*
+ * Copyright (c) 2025-Present, Anton Muzhytskyi
+ * All rights reserved.
+ *
+ * This code is developed and owned by Anton Muzhytskyi.
+ * Unauthorized copying of this file, via any medium, is strictly prohibited.
+ */
 
 /**
  * ViewModel responsible for managing game state and business logic for levels.
@@ -19,10 +25,6 @@ import kotlinx.coroutines.flow.asStateFlow
  *
  * @param gameRepository Repository for accessing game data and persistence
  */
-/*
-class GameViewModel(
-    val gameRepository: com.am.zviryata.repository.GameRepository) : ViewModel() {
-*/
 class GameViewModel(
     val gameRepository: GameRepository,
     private val adManager: AdManager
@@ -49,7 +51,6 @@ class GameViewModel(
                 }
             }
         }
-        // Load interstitial ad on initialization
         loadInterstitialAd()
     }
 
@@ -119,7 +120,6 @@ class GameViewModel(
     private fun proceedAfterAd(nextLevelId: Int) {
         if (gameRepository.getLevel(nextLevelId) != null) {
             setCurrentLevel(nextLevelId)
-            gameRepository.completeLevel(nextLevelId)
         } else {
             _levelState.value = LevelState.GameCompleted
         }
@@ -132,6 +132,13 @@ class GameViewModel(
         gameRepository.completeLevel(_currentLevel.value)
         _levelState.value = LevelState.Completed
     }
+
+    fun startLevelCompletion() {
+        viewModelScope.launch {
+            handleLevelCompletion()
+        }
+    }
+
 }
 
 /**
@@ -144,47 +151,3 @@ sealed class LevelState {
     object GameCompleted : LevelState()
     data class ShowingAd(val nextLevelId: Int) : LevelState()
 }
-
-//1000
-/*
-class GameViewModel(
-    val gameRepository: com.am.zviryata.repository.GameRepository
-) : ViewModel() {
-
-    private val _currentLevel = MutableStateFlow(1)
-    val currentLevel: StateFlow<Int> get() = _currentLevel
-
-    private val _animalsClicked = MutableStateFlow(setOf<Int>())
-    val animalsClicked: StateFlow<Set<Int>> get() = _animalsClicked
-
-    fun loadLevel(level: Int) {
-        _currentLevel.value = level
-        _animalsClicked.value = emptySet()
-    }
-
-    fun setCurrentLevel(levelId: Int) {
-        _currentLevel.value = levelId
-        resetLevel()
-    }
-
-    fun nextLevel() {
-        val newLevel = _currentLevel.value + 1
-        _currentLevel.value = newLevel
-        gameRepository.completeLevel(newLevel)
-    }
-
-    fun isLevelCompleted(id: Int): Boolean {
-        val animals = gameRepository.getLevelAnimals(_currentLevel.value)
-        return _animalsClicked.value.size == animals.size
-    }
-
-    fun onAnimalClicked(index: Int) {
-        _animalsClicked.value = _animalsClicked.value + index
-    }
-
-    fun resetLevel() {
-        _animalsClicked.value = emptySet()
-    }
-
-}
-*/

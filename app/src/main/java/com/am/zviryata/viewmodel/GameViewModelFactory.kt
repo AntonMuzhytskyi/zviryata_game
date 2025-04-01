@@ -5,6 +5,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.am.zviryata.repository.GameRepository
 import com.am.zviryata.services.AdManager
 
+/*
+ * Copyright (c) 2025-Present, Anton Muzhytskyi
+ * All rights reserved.
+ *
+ * This code is developed and owned by Anton Muzhytskyi.
+ * Unauthorized copying of this file, via any medium, is strictly prohibited.
+ */
+
 /**
  * Factory class for creating instances of GameViewModel.
  * Provides dependency injection for the repository.
@@ -25,15 +33,3 @@ class GameViewModelFactory(
     }
 }
 
-
-//1000
-
-/*
-class GameViewModelFactory(
-    private val gameRepository: com.am.zviryata.repository.GameRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return GameViewModel(gameRepository) as T
-    }
-}
-*/
