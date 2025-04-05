@@ -57,6 +57,12 @@ Want to try the game without building it yourself?
 
 > Compatible with Android 7.0 (API 24) and up.
 
+## 🖼️ Screenshots
+
+![Level Screen](screenshot1.png)
+![Level Screen](screenshot2.png)
+![Level Screen](screenshot3.png)
+![Level Screen](screenshot4.png)
 
 ## About Me
 This project was built as a portfolio piece to demonstrate my skills as an indie Android developer. It reflects my passion for clean UI, architecture, and joyful user experience.
